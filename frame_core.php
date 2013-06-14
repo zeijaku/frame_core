@@ -569,7 +569,7 @@
 			/*
 			 * モザイク
 			 */
-			imagefilter($dst_im, IMG_FILTER_PIXELATE, $img_info['0']/($img_info['0']/4), true);
+			imagefilter($dst_im, IMG_FILTER_PIXELATE, $img_info['0']/($img_info['0']/$level), true);
 		}
 
 		//imagedestroy($dst_im);
