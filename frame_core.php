@@ -56,17 +56,38 @@
 		$result = "";
 		if( isset($_POST[$val]) )
 		{
-			if( $security == "xss" )
+			// 配列確認
+			if( is_array($_POST[$val]) == true )
 			{
-				$result = htmlspecialchars($_POST[$val], ENT_QUOTES, 'UTF-8');
+				$result = array();
+				foreach( $_POST[$val] as $key => $value )
+				{
+					if( $security == "xss" )
+					{
+						$result[] = htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+					}
+					else
+					{
+						$result[] = $value;
+					}
+				}
 			}
 			else
 			{
-				$result = $_POST[$val];
+				$result = "";
+				if( isset($_POST[$val]) )
+				{
+					if( $security == "xss" )
+					{
+						$result = htmlspecialchars($_POST[$val], ENT_QUOTES, 'UTF-8');
+					}
+					else
+					{
+						$result = $_POST[$val];
+					}
+				}
 			}
-
 		}
-
 		return $result;
 	}
 	/*
@@ -680,6 +701,7 @@
 	 * @ $config['upload_folder']	= アップロードファイル保存先
 	 * @ $config['upload_char']		= input type="file" name="upload_char"
 	 * @ $config['upload_type']		= ファイル種類
+	 * @ $config['upload_filename']	= アップロード後ファイル名
 	 */
 	function file_upload($config = false)
 	{
@@ -696,17 +718,56 @@
 			$upload_char = $config['upload_char'];
 			// ファイル種類
 			$upload_type = $config['upload_type'];
+			// アップロード後ファイル名
+			$upload_filename = $config['upload_filename'];
 		}
 
 		if(isset($_FILES[$upload_char]["tmp_name"]))
 		{
+
+			/*
+			 * image指定時
+			 * 画像判定
+			 */
+			if( $upload_type == "image" )
+			{
+				// 画像判定
+				if( filesize($_FILES[$upload_char]["tmp_name"]) > 11 )
+				{
+					// 12byte以上のファイルのみ判定
+					$image_type = exif_imagetype($_FILES[$upload_char]["tmp_name"]);
+				}
+				else
+				{
+					// 12byte以下はエラー判定
+					$result['error'] = 'UPLOAD_NO_FILE_IMAGE';
+					return $result;
+				}
+				
+				if( $image_type == false )
+				{
+					// 画像でない場合エラー判定
+					$result['error'] = 'UPLOAD_NO_FILE_IMAGE';
+					return $result;
+				}
+			}
+
 			// 保存先確認
 			if( !is_dir($upload_folder) )
 			{
 				mkdir($upload_folder, 0755);
 			}
 
-			$filename = $_FILES[$upload_char]['name'];
+			// アップロードファイル名
+			if( $upload_filename != "" )
+			{
+				$filename = $upload_filename;
+			}
+			else
+			{
+				$filename = $_FILES[$upload_char]['name'];
+			}
+
 			if(move_uploaded_file($_FILES[$upload_char]['tmp_name'], $upload_folder.$filename)==FALSE)
 			{
 				// エラーハンドリング
@@ -752,6 +813,39 @@
 				$result['size'] = filesize($upload_folder.$filename);
 				$result['width'] = $width;
 				$result['height'] = $height;
+			}
+		}
+		else
+		{
+			// エラーハンドリング
+			$error = ( ! isset($_FILES[$upload_char]['error'])) ? 4 : $_FILES[$upload_char]['error'];
+
+			switch($error)
+			{
+				case 1:
+					$result['error'] = 'UPLOAD_ERR_INI_SIZE';
+					break;
+				case 2:
+					$result['error'] = 'UPLOAD_ERR_FORM_SIZE';
+					break;
+				case 3:
+					$result['error'] = 'UPLOAD_ERR_PARTIAL';
+					break;
+				case 4:
+					$result['error'] = 'UPLOAD_ERR_NO_FILE';
+					break;
+				case 6:
+					$result['error'] = 'UPLOAD_ERR_NO_TMP_DIR';
+					break;
+				case 7:
+					$result['error'] = 'UPLOAD_ERR_CANT_WRITE';
+					break;
+				case 8:
+					$result['error'] = 'UPLOAD_ERR_EXTENSION';
+					break;
+				default :
+					$result['error'] = 'UPLOAD_NO_FILE_SELECTED';
+					break;
 			}
 		}
 
