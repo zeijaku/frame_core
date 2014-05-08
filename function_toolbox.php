@@ -469,6 +469,141 @@ function image_resize($filename, $new_width = false, $new_height = false)
 }
 /*
  * ********************
+ * 形式変換
+ * ********************
+ * @ output_filename = 出力ファイル名(null時はダイレクト出力)
+ * @ output_type = 変換形式(jpg/gif/png/bmp)
+ */
+function image_convert($filename, $output_filename = null, $output_type = false)
+{
+    /*
+     * クオリティー
+     */
+    $output_quority = "75";
+
+    /*
+     * 元画像形式判別
+     */
+    $file_val = file_get_contents($filename);
+    if (strncmp("\x00\x00\x01\x00", $file_val, 4) == 0) {
+        // ICO
+        $basetype = "ico";
+    } else if (strncmp("\x89PNG\x0d\x0a\x1a\x0a", $file_val, 8) == 0) {
+        // PNG
+        $basetype = "png";
+    } else if (strncmp('BM', $file_val, 2) == 0) {
+        // BMP
+        $basetype = "bmp";
+    } else if (strncmp('GIF87a', $file_val, 6) == 0 || strncmp('GIF89a', $file_val, 6) == 0) {
+        // GIF
+        $basetype = "gif";
+    } else if (strncmp("\xff\xd8", $file_val, 2) == 0) {
+        // JPEG
+        $basetype = "jpg";
+    } else {
+        $basetype = "";
+    }
+
+    /*
+     * 形式に合わせて展開
+     */
+    if( $basetype == "jpg" )
+    {
+        $image = imagecreatefromjpeg($filename);
+    }
+    elseif( $basetype == "gif" )
+    {
+        $image = imagecreatefromgif($filename);
+    }
+    elseif( $basetype == "png" )
+    {
+        $image = imagecreatefrompng($filename);
+    }
+    elseif( $basetype == "bmp" )
+    {
+        $image = imagecreatefromwbmp($filename);
+    }
+
+    /*
+     * 指定形式に変換・保存
+     */
+    if( $output_filename == null )
+    {
+        if( $output_type == "jpg" )
+        {
+            // JPG形式で保存
+            imagejpeg($image, null, $output_quority0);
+        }
+        elseif( $output_type == "gif" )
+        {
+            // GIF形式で保存
+            imagegif($image, null, $output_quority);
+        }
+        elseif( $output_type == "png" )
+        {
+            // PNG形式で保存
+            imagepng($image, null, 0);
+        }
+        elseif( $output_type == "bmp" )
+        {
+            // BMP形式で保存
+            imagewbmp($image, null);
+        }
+    }
+    else
+    {
+        if( $output_type == "jpg" )
+        {
+            // JPG形式で保存
+            imagejpeg($image, $output_filename, $output_quority);
+        }
+        elseif( $output_type == "gif" )
+        {
+            // GIF形式で保存
+            imagegif($image, $output_filename, $output_quority);
+        }
+        elseif( $output_type == "png" )
+        {
+            // PNG形式で保存
+            imagepng($image, $output_filename, 0);
+        }
+        elseif( $output_type == "bmp" )
+        {
+            // BMP形式で保存
+            imagewbmp($image, $output_filename);
+        }
+    }
+
+    // メモリ解放
+    imagedestroy($image);
+}
+/*
+ * ********************
+ * 文字合成
+ * ********************
+ * @ output_filename = 出力ファイル名(null時はダイレクト出力)
+ * @ output_type = 変換形式(jpg/gif/png/bmp)
+ */
+function image_synthesis($word, $size_x, $size_y, $word_position = false, $output_type = false)
+{
+    // 画像生成
+    $image = imagecreate( $size_x,  $size_y );
+
+    // 白色背景 + 青色テキスト
+    $bg = imagecolorallocate($image, 128, 128, 128);
+    $textcolor = imagecolorallocate($image, 0, 0, 255);
+
+    // 左上に文字列描画
+    imagestring($image, 64, 16, 0, $word, $textcolor);
+
+    // 出力
+    header("Content-Type: image/jpeg");
+    imagejpeg($image, null);
+    imagedestroy($image);
+
+}
+/*
+ * ********************
  * 回転
  * ********************
  * @ angle			= 角度
