@@ -1187,7 +1187,80 @@ function time_diff($s_point = false, $e_point = false)
 
     return $result;
 }
+// --------------------------------------------------
+// オプション機能
+// --------------------------------------------------
+/*
+ * ********************
+ * GET値 URL組み立て
+ * ********************
+ * @ GET値をURL組立
+ */
+function assenble_gettoget()
+{
+    $get_assenble = "?";
+    $get_count_s = "0";
+    $get_count_e = count($_GET);
+    foreach( $_GET as $val => $tmp )
+    {
+        $get_assenble .= $val . "=" . $tmp;
+        $get_count_s++;
+        if( $get_count_e > $get_count_s )
+        {
+            $get_assenble .= "&";
+        }
+    }
 
+    return $get_assenble;
+}
+/*
+ * ********************
+ * POST値 URL組み立て
+ * ********************
+ * @ POST値をGET値へ組立
+ */
+function assenble_posttoget()
+{
+    $post_assenble = "?";
+    $post_count_s = "0";
+    $post_count_e = count($_POST);
+    foreach( $_POST as $val => $tmp )
+    {
+        $post_assenble .= $val . "=" . $tmp;
+        $post_count_s++;
+        if( $post_count_e > $post_count_s )
+        {
+            $post_assenble .= "&";
+        }
+    }
 
+    return $post_assenble;
+}
+/*
+ * ********************
+ * 一部マスク化
+ * hoge@hoge.com -> h***@***.com
+ * ********************
+ */
+function safe_mask($target_mask)
+{
+    // 初期化
+    $result = "";
+
+    $target_len = strlen($target_mask);
+    $target_part = str_split($target_mask);
+    for( $mask = 0; $mask < $target_len; $mask++ )
+    {
+        if( (mt_rand(0, 3) % 2) == 0 )
+        {
+            $result .= $target_part[$mask];
+        }
+        else
+        {
+            $result .= "*";
+        }
+    }
+    return $result;
+}
 /* End of file frame_core.php */
 /* Location: ./frame_core.php */
