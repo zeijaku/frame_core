@@ -7,10 +7,10 @@
  * An open source application development framework for PHP 5.2.2 or newer
  *
  * @package		Single FrameWork
- * @author			zeijaku.net
- * @copyright		Copyright (c) 2013
+ * @author		zeijaku.net
+ * @copyright	Copyright (c) 2013
  * @license		Apache License 2.0
- * @link				http://zeijaku.net/
+ * @link		http://zeijaku.net/
  * @version		Version 1.0
  * @character	UTF-8
  * @filesource
@@ -576,31 +576,6 @@ function image_convert($filename, $output_filename = null, $output_type = false)
 
     // メモリ解放
     imagedestroy($image);
-}
-/*
- * ********************
- * 文字合成
- * ********************
- * @ output_filename = 出力ファイル名(null時はダイレクト出力)
- * @ output_type = 変換形式(jpg/gif/png/bmp)
- */
-function image_synthesis($word, $size_x, $size_y, $word_position = false, $output_type = false)
-{
-    // 画像生成
-    $image = imagecreate( $size_x,  $size_y );
-
-    // 白色背景 + 青色テキスト
-    $bg = imagecolorallocate($image, 128, 128, 128);
-    $textcolor = imagecolorallocate($image, 0, 0, 255);
-
-    // 左上に文字列描画
-    imagestring($image, 64, 16, 0, $word, $textcolor);
-
-    // 出力
-    header("Content-Type: image/jpeg");
-    imagejpeg($image, null);
-    imagedestroy($image);
-
 }
 /*
  * ********************
