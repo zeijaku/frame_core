@@ -189,6 +189,8 @@ function encode($val, $strength = 2)
         $key_array[$i] = substr(crypt($CRYPT_KEY), mt_rand("1", strlen(crypt($CRYPT_KEY)) - 1), 1);
         $crypt_target .= $key_array[$i] . $crypt_target_array[$i];
     }
+    $crypt_target .= $crypt_target_array[mt_rand("1", strlen(crypt($CRYPT_KEY)))];
+
     $length = intval($CRYPT_STRENGTH);
     for($j = 0; $j < $length; $j++)
     {
@@ -209,6 +211,8 @@ function decode($val, $strength = 2)
      */
     $CRYPT_STRENGTH = $strength; // 復号強度
     $CRYPT_KEY = crypt($CRYPT_STRENGTH);
+
+    $decrypt_target = mb_substr($decrypt_target, 0, mb_strlen($decrypt_target) - 1);
 
     $length = intval($CRYPT_STRENGTH);
     for($i = 0; $i < $length; $i++)
