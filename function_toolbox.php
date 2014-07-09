@@ -189,7 +189,7 @@ function encode($val, $strength = 2)
         $key_array[$i] = substr(crypt($CRYPT_KEY), mt_rand("1", strlen(crypt($CRYPT_KEY)) - 1), 1);
         $crypt_target .= $key_array[$i] . $crypt_target_array[$i];
     }
-    $crypt_target .= $crypt_target_array[mt_rand("1", strlen(crypt($CRYPT_KEY)))];
+    $crypt_target .= substr($val, mt_rand("1", strlen($val) - 1), 1);
 
     $length = intval($CRYPT_STRENGTH);
     for($j = 0; $j < $length; $j++)
