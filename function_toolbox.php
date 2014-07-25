@@ -506,6 +506,8 @@ function image_convert($filename, $output_filename = null, $output_type = false)
         $basetype = "jpg";
     } else {
         $basetype = "";
+        return false;
+        exit;
     }
 
     /*
@@ -536,7 +538,7 @@ function image_convert($filename, $output_filename = null, $output_type = false)
         if( $output_type == "jpg" )
         {
             // JPG形式で保存
-            imagejpeg($image, null, $output_quority0);
+            imagejpeg($image, null, $output_quority);
         }
         elseif( $output_type == "gif" )
         {
@@ -580,6 +582,7 @@ function image_convert($filename, $output_filename = null, $output_type = false)
 
     // メモリ解放
     imagedestroy($image);
+    return true;
 }
 /*
  * ********************
